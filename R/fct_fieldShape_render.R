@@ -32,19 +32,19 @@
 #'
 #' @export
 fieldShape_render <- function(mosaic,
-                               ncols, 
-                               nrows, 
-                               fieldData=NULL,
-                               fieldMap=NULL,
-                               PlotID=NULL,
-                               buffer=NULL,
-                               plot_size=NULL,
-                               r=1,
-                               g=2,
-                               b=3,
-                               color_options=viridisLite::viridis,
-                               max_pixels=100000000,
-                               downsample=5
+                              ncols, 
+                              nrows, 
+                              fieldData=NULL,
+                              fieldMap=NULL,
+                              PlotID=NULL,
+                              buffer=NULL,
+                              plot_size=NULL,
+                              r=1,
+                              g=2,
+                              b=3,
+                              color_options=viridisLite::viridis,
+                              max_pixels=100000000,
+                              downsample=5
 ) {
   print("Starting analysis ...")
   if (is.null(mosaic)) {
@@ -146,24 +146,58 @@ fieldShape_render <- function(mosaic,
             points <- c(points, rectangles[[i]])
           }
           st_crs(points) <- st_crs(cen)
-          grid_shapefile <- st_as_sf(points)
-          grid_shapefile <- st_transform(grid_shapefile, st_crs(mosaic))
-        } else {
+          grid <- st_as_sf(points)
+          grid<-st_transform(grid, st_crs('EPSG:4326'))
+          b<-st_transform(grid_shapefile, crs = 4326)
+          ga = st_geometry(grid)
+          cga = st_centroid(ga)
+          grid_shapefile = (ga-cga) *parameters+cga
+          if(!is.null(mosaic_layer)){
+            st_crs(grid_shapefile) <- st_crs(mosaic)
+            grid_shapefile<-st_as_sf(grid_shapefile)
+          }
+          if(is.null(mosaic_layer)){
+            st_crs(grid_shapefile) <- st_crs(points_layer)
+            grid_shapefile<-st_as_sf(grid_shapefile)
+          }
+          print(grid_shapefile)  
+        }else
+        {
           cen <- suppressWarnings(st_centroid(grid_shapefile))
+          
           bbox_list <- lapply(st_geometry(cen), st_bbox)
           points_list <- lapply(bbox_list, st_as_sfc)
+          
           rectangles <- lapply(points_list, function(pt) rect_around_point(pt, plot_size[1], plot_size[2]))
+          
           points <- rectangles[[1]]
           for (i in 2:length(rectangles)) {
             points <- c(points, rectangles[[i]])
           }
           st_crs(points) <- st_crs(cen)
-          grid_shapefile <- st_as_sf(points)
-          grid_shapefile <- st_transform(grid_shapefile, st_crs(mosaic))
+          grid <- st_as_sf(points)
+          if(!is.null(mosaic_layer)){
+            st_crs(grid) <- st_crs(mosaic)
+          }
+          if(is.null(mosaic_layer)){
+            st_crs(grid) <- st_crs(points_layer)
+          }
+          b<-st_transform(grid_shapefile, crs = 4326)
+          ga = st_geometry(grid)
+          cga = st_centroid(ga)
+          grid_shapefile = (ga-cga) *parameters+cga
+          if(!is.null(mosaic_layer)){
+            st_crs(grid_shapefile) <- st_crs(mosaic)
+            grid_shapefile<-st_as_sf(grid_shapefile)
+          }
+          if(is.null(mosaic_layer)){
+            st_crs(grid_shapefile) <- st_crs(points_layer)
+            grid_shapefile<-st_as_sf(grid_shapefile)
+          }
+          print(grid_shapefile)  
         }
       }
     }
-    
     if (!is.null(buffer)) {
       if (st_is_longlat(grid_shapefile)) {
         grid_shapefile <- st_transform(grid_shapefile, crs = 3857)
@@ -200,7 +234,7 @@ fieldShape_render <- function(mosaic,
         plots <- grid_shapefile
       } 
     }
-    print("End!")
+    
     return(plots)
   } else {
     cat("\033[31m", "Error: Select four points only. Points must be set at the corners of the field of interest under the plots space", "\033[0m", "\n")
