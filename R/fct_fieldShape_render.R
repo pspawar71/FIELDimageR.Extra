@@ -152,11 +152,11 @@ fieldShape_render <- function(mosaic,
           ga = st_geometry(grid)
           cga = st_centroid(ga)
           grid_shapefile = (ga-cga) *parameters+cga
-          if(!is.null(mosaic_layer)){
+          if(!is.null(mosaic)){
             st_crs(grid_shapefile) <- st_crs(mosaic)
             grid_shapefile<-st_as_sf(grid_shapefile)
           }
-          if(is.null(mosaic_layer)){
+          if(is.null(mosaic)){
             st_crs(grid_shapefile) <- st_crs(points_layer)
             grid_shapefile<-st_as_sf(grid_shapefile)
           }
@@ -176,21 +176,21 @@ fieldShape_render <- function(mosaic,
           }
           st_crs(points) <- st_crs(cen)
           grid <- st_as_sf(points)
-          if(!is.null(mosaic_layer)){
+          if(!is.null(mosaic)){
             st_crs(grid) <- st_crs(mosaic)
           }
-          if(is.null(mosaic_layer)){
+          if(is.null(mosaic)){
             st_crs(grid) <- st_crs(points_layer)
           }
           b<-st_transform(grid_shapefile, crs = 4326)
           ga = st_geometry(grid)
           cga = st_centroid(ga)
           grid_shapefile = (ga-cga) *parameters+cga
-          if(!is.null(mosaic_layer)){
+          if(!is.null(mosaic)){
             st_crs(grid_shapefile) <- st_crs(mosaic)
             grid_shapefile<-st_as_sf(grid_shapefile)
           }
-          if(is.null(mosaic_layer)){
+          if(is.null(mosaic)){
             st_crs(grid_shapefile) <- st_crs(points_layer)
             grid_shapefile<-st_as_sf(grid_shapefile)
           }
