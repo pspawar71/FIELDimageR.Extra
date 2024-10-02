@@ -160,7 +160,7 @@ fieldShape_render <- function(mosaic,
             st_crs(grid_shapefile) <- st_crs(points_layer)
             grid_shapefile<-st_as_sf(grid_shapefile)
           }
-          print(grid_shapefile)  
+        
         }else
         {
           cen <- suppressWarnings(st_centroid(grid_shapefile))
@@ -194,7 +194,7 @@ fieldShape_render <- function(mosaic,
             st_crs(grid_shapefile) <- st_crs(points_layer)
             grid_shapefile<-st_as_sf(grid_shapefile)
           }
-          print(grid_shapefile)  
+          
         }
       }
     }
